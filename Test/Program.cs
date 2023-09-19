@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Data;
+using System.Drawing;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Reflection;
@@ -30,17 +31,16 @@ namespace MyApp // Note: actual namespace depends on the project name.
         {
             display(TTTBoard);
             string Player = firstMove();
+            string moveTracker = Player;
+
             string Winner = "";
+            
 
             while (!isWinner(out Winner) || ConsecDraws >= 5)
             {
-                // playermoves gets the coordinates of their moves
                 playermoves = playerMove(Player);
-                // updates board from data coming from playermoves
                 updateBoard(playermoves[0], playermoves[1], Player);
-                // changes player turn
                 Player = changePlayerTurn(Player);
-                // checks if there's a winner
                 if (winDetection(Player, out Winner))
                 {
                     if (Winner == "X")
@@ -55,16 +55,31 @@ namespace MyApp // Note: actual namespace depends on the project name.
                     }
                     ConsecDraws = 0;
                     roundEnd("win", Winner);
+
+                    // Ensures the game alternates who goes first
+                    Player = changePlayerTurn(moveTracker);
+                    moveTracker = Player;
+
                 }
-                // if populated
+                // if board is populated or draw
                 if (isPopulated(TTTBoard))
                 {
                     ConsecDraws++;
                     roundEnd("draw", "");
                 }
             }
-            Console.WriteLine("The Winner is the best of 5 is {0}!", Winner);
+            Console.WriteLine("The Winner of the best of 5 is the {0}!", Winner);
             Console.ReadKey();
+        }
+
+        static string firstMove()
+        {
+            if (rnd.Next(1, 10) % 2 == 0)
+                Player = "Human";
+            else
+                Player = "Computer";
+
+            return Player;
         }
 
         static void OutputHistory()
@@ -96,11 +111,11 @@ namespace MyApp // Note: actual namespace depends on the project name.
         }
 
 
-        static void roundEnd(string results, string winner_)
+        static void roundEnd(string result, string winner_)
         {
-            if (results == "win")
-                Console.WriteLine("The winner is of this round is {0}!", winner_);
-            else 
+            if (result == "win")
+                Console.WriteLine("The winner of this round is {0}!", winner_);
+            else
                 Console.WriteLine("Round draw!");
             Console.ReadKey();
 
@@ -140,7 +155,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
                         winner = TTTBoard[2, col];
                         return true;
                     }
-                        
+
                 }
             // check col
             for (int row = 0; row < TTTBoard.GetLength(1); row++)
@@ -159,7 +174,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
             if ((TTTBoard[2, 0] == TTTBoard[1, 1]) && (TTTBoard[1, 1] == TTTBoard[0, 2]))
             {
                 if (TTTBoard[2, 0] != null)
-                { 
+                {
                     winner = TTTBoard[2, 0];
                     return true;
                 }
@@ -177,63 +192,69 @@ namespace MyApp // Note: actual namespace depends on the project name.
 
             return false;
         }
-        static string prayingForDownfall()
+        static string AIprayingformydownfall()
         {
             string coord = "";
-
+            // col
             for (int col = 0; col < TTTBoard.GetLength(1); col++)
-            { 
+            {
                 if ((TTTBoard[col, 2] == TTTBoard[col, 1]))
                     if (TTTBoard[col, 2] == "X")
-                        coord =  col + "0";
+                        coord = col + "0";
 
-
-                else if (TTTBoard[col, 1] == TTTBoard[col, 0])
+                if (TTTBoard[col, 1] == TTTBoard[col, 0])
                     if (TTTBoard[col, 1] == "X")
                         coord = col + "2";
 
-                else if (TTTBoard[col, 2] == TTTBoard[0, col])
+                if (TTTBoard[col, 2] == TTTBoard[0, col])
                     if (TTTBoard[col, 2] == "X")
                         coord = col + "1";
             }
-
+            // row
             for (int col = 0; col < TTTBoard.GetLength(0); col++)
             {
 
-                if ((TTTBoard[2, col] == TTTBoard[1, col]) )
+                if ((TTTBoard[2, col] == TTTBoard[1, col]))
                     if (TTTBoard[2, col] == "X")
                         coord = "0" + col;
 
-                else if (TTTBoard[1, col] == TTTBoard[0, col])
+                if (TTTBoard[1, col] == TTTBoard[0, col])
                     if (TTTBoard[1, col] == "X")
-                        coord = "0" + col;
+                        coord = "2" + col;
 
-                else if (TTTBoard[2, col] == TTTBoard[0, col])
+                if (TTTBoard[2, col] == TTTBoard[0, col])
                     if (TTTBoard[2, col] == "X")
-                        coord = "0" + col;
+                        coord = "1" + col;
 
             }
-
+            // check / diagonal
             if (TTTBoard[2, 0] == TTTBoard[1, 1])
                 if (TTTBoard[2, 0] == "X")
                     coord = "02";
-            else if (TTTBoard[1, 1] == TTTBoard[0, 2])
-                if (TTTBoard[2, 0] == "X")
-                    coord = "02";
+            if (TTTBoard[1, 1] == TTTBoard[0, 2])
+                if (TTTBoard[1, 1] == "X")
+                    coord = "20";
+            if ((TTTBoard[0, 2]) == TTTBoard[2, 0])
+                if (TTTBoard[0, 2] == "X")
+                    coord = "11";
 
+            // check \ diagonal
+            if (TTTBoard[0, 0] == TTTBoard[1, 1])
+                if (TTTBoard[0, 0] == "X")
+                    coord = "22";
+
+            if (TTTBoard[1, 1] == TTTBoard[2, 2])
+                if (TTTBoard[1, 1] == "X")
+                    coord = "00";
+
+            if ((TTTBoard[0, 0]) == TTTBoard[2, 2])
+                if (TTTBoard[0, 0] == "X")
+                    coord = "11";
 
             return coord;
 
         }
-        static string firstMove()
-        {
-            if (rnd.Next(1, 10) % 2 == 0)
-                Player = "Human";
-            else
-                Player = "Computer";
 
-            return Player;
-        }
 
         static List<string> validCoordinates(string[,] board)
         {
@@ -278,9 +299,9 @@ namespace MyApp // Note: actual namespace depends on the project name.
                     if (Pool.Contains(xcoor + ycoor))
                     {
                         valid = true;
-                        string temp = "X: " + xcoor + "," + ycoor;
-                        Logs.Add(temp);
+                        Logs.Add("X: " + xcoor + "," + ycoor);
                     }
+                        
                     else
                         display(TTTBoard);
 
@@ -291,13 +312,39 @@ namespace MyApp // Note: actual namespace depends on the project name.
 
             if (Player == "Computer")
             {
-                // gets random coordinate from pool
-                int computerMove = rnd.Next(0, Pool.Count);
-                xcoor = Pool[computerMove][0].ToString();
-                ycoor = Pool[computerMove][1].ToString();
-                string temp = "O: " + xcoor + "," + ycoor;
-                Logs.Add(temp);
+                
+                int attempts = 0;
+                bool randomize = false;
+                while (attempts < Pool.Count)
+                {
+                    // Computer makes calculated moves to counter the human
+                    string coords = AIprayingformydownfall();
+                    if (Pool.Contains(coords))
+                    {
+                        Console.WriteLine("The coordinates: " + coords[0] + "," + coords[1] + " was calculated by the computer");
+                        xcoor = coords[0].ToString();
+                        ycoor = coords[1].ToString();
+                        randomize = false;
+                        Logs.Add("O: " + xcoor + "," + ycoor);
+                        break;
+                    }
+                    randomize = true;
+                    attempts++;
+                }
+
+                // No smart play so just pick a random valid coordinate from the pool
+                if (randomize)
+                {
+                    Console.WriteLine("AI function was not called");
+                    int computerMove = rnd.Next(0, Pool.Count);
+                    xcoor = Pool[computerMove][0].ToString();
+                    ycoor = Pool[computerMove][1].ToString();
+                    Logs.Add("O: " + xcoor + "," + ycoor);
+                }
+
             }
+
+
 
             return new List<string> { xcoor, ycoor };
         }
@@ -334,7 +381,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
 
         static void display(string[,] board)
         {
-            Console.Clear();
+            //Console.Clear();
             Console.WriteLine("Player Human:X \t Player Computer:O");
             Console.WriteLine("Human Wins:{0} \t Computer Wins:{1}", HumanWins, ComputerWins);
             for (int row = 0; row < board.GetLength(0); row++)
