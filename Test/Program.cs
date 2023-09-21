@@ -194,64 +194,117 @@ namespace MyApp // Note: actual namespace depends on the project name.
         }
         static string AIprayingformydownfall()
         {
+            Pool.Clear();
+            Pool = validCoordinates(TTTBoard);
             string coord = "";
-            // col
-            for (int col = 0; col < TTTBoard.GetLength(1); col++)
+            int attempts = 0;
+
+
+            while (attempts < Pool.Count)
             {
-                if ((TTTBoard[col, 2] == TTTBoard[col, 1]))
-                    if (TTTBoard[col, 2] == "X")
-                        coord = col + "0";
+                // col
+                for (int col = 0; col < TTTBoard.GetLength(1); col++)
+                {
+                    //Console.WriteLine("Checking col {0}", col);
+                    if ((TTTBoard[col, 2] == TTTBoard[col, 1]))
+                        if (TTTBoard[col, 2] != null)
+                            coord = col + "0";
+                    if (Pool.Contains(coord))
+                        return coord;
 
-                if (TTTBoard[col, 1] == TTTBoard[col, 0])
-                    if (TTTBoard[col, 1] == "X")
-                        coord = col + "2";
+                    if (TTTBoard[col, 1] == TTTBoard[col, 0])
+                        if (TTTBoard[col, 1] != null)
+                            coord = col + "2";
 
-                if (TTTBoard[col, 2] == TTTBoard[0, col])
-                    if (TTTBoard[col, 2] == "X")
-                        coord = col + "1";
+                    if (Pool.Contains(coord))
+                        return coord;
+
+                    if (TTTBoard[col, 2] == TTTBoard[col, 0])
+                        if (TTTBoard[col, 2] != null)
+                            coord = col + "1";
+
+                    if (Pool.Contains(coord))
+                        return coord;
+                }
+
+                    // row
+                for (int col = 0; col < TTTBoard.GetLength(0); col++)
+                {
+
+                    //Console.WriteLine("Checking row {0}", col);
+                    if ((TTTBoard[2, col] == TTTBoard[1, col]))
+                        if (TTTBoard[2, col] != null)
+                            coord = "0" + col;
+                    if (Pool.Contains(coord))
+                        return coord;
+
+                    if (TTTBoard[1, col] == TTTBoard[0, col])
+                        if (TTTBoard[1, col] != null)
+                            coord = "2" + col;
+
+                    if (Pool.Contains(coord))
+                        return coord;
+
+                    if (TTTBoard[2, col] == TTTBoard[0, col])
+                        if (TTTBoard[2, col] != null)
+                            coord = "1" + col;
+
+                    if (Pool.Contains(coord))
+                        return coord;
+                }
+
+
+                // check / diagonal
+                //Console.WriteLine("Checking / Diagonal");
+                if (TTTBoard[2, 0] == TTTBoard[1, 1])
+                    if (TTTBoard[2, 0] != null)
+                        coord = "02";
+
+                if (Pool.Contains(coord))
+                    return coord;
+
+                if (TTTBoard[1, 1] == TTTBoard[0, 2])
+                    if (TTTBoard[1, 1] != null)
+                        coord = "20";
+
+                if (Pool.Contains(coord))
+                    return coord;
+
+                if ((TTTBoard[0, 2]) == TTTBoard[2, 0])
+                    if (TTTBoard[0, 2] != null)
+                        coord = "11";
+
+                if (Pool.Contains(coord))
+                    return coord;
+
+                // check \ diagonal
+                //Console.WriteLine("Checking other Diagonal");
+                if (TTTBoard[0, 0] == TTTBoard[1, 1])
+                    if (TTTBoard[0, 0] != null)
+                        coord = "22";
+
+                if (Pool.Contains(coord))
+                    return coord;
+
+                if (TTTBoard[1, 1] == TTTBoard[2, 2])
+                    if (TTTBoard[1, 1] != null)
+                        coord = "00";
+
+                if (Pool.Contains(coord))
+                    return coord;
+
+                if ((TTTBoard[0, 0]) == TTTBoard[2, 2])
+                    if (TTTBoard[0, 0] != null)
+                        coord = "11";
+
+                if (Pool.Contains(coord))
+                    return coord;
+
+                attempts++;
+
             }
-            // row
-            for (int col = 0; col < TTTBoard.GetLength(0); col++)
-            {
-
-                if ((TTTBoard[2, col] == TTTBoard[1, col]))
-                    if (TTTBoard[2, col] == "X")
-                        coord = "0" + col;
-
-                if (TTTBoard[1, col] == TTTBoard[0, col])
-                    if (TTTBoard[1, col] == "X")
-                        coord = "2" + col;
-
-                if (TTTBoard[2, col] == TTTBoard[0, col])
-                    if (TTTBoard[2, col] == "X")
-                        coord = "1" + col;
-
-            }
-            // check / diagonal
-            if (TTTBoard[2, 0] == TTTBoard[1, 1])
-                if (TTTBoard[2, 0] == "X")
-                    coord = "02";
-            if (TTTBoard[1, 1] == TTTBoard[0, 2])
-                if (TTTBoard[1, 1] == "X")
-                    coord = "20";
-            if ((TTTBoard[0, 2]) == TTTBoard[2, 0])
-                if (TTTBoard[0, 2] == "X")
-                    coord = "11";
-
-            // check \ diagonal
-            if (TTTBoard[0, 0] == TTTBoard[1, 1])
-                if (TTTBoard[0, 0] == "X")
-                    coord = "22";
-
-            if (TTTBoard[1, 1] == TTTBoard[2, 2])
-                if (TTTBoard[1, 1] == "X")
-                    coord = "00";
-
-            if ((TTTBoard[0, 0]) == TTTBoard[2, 2])
-                if (TTTBoard[0, 0] == "X")
-                    coord = "11";
-
-            return coord;
+           
+            return "11";
 
         }
 
@@ -312,28 +365,17 @@ namespace MyApp // Note: actual namespace depends on the project name.
 
             if (Player == "Computer")
             {
-                
-                int attempts = 0;
-                bool randomize = false;
-                while (attempts < Pool.Count)
-                {
-                    // Computer makes calculated moves to counter the human
-                    string coords = AIprayingformydownfall();
-                    if (Pool.Contains(coords))
-                    {
-                        Console.WriteLine("The coordinates: " + coords[0] + "," + coords[1] + " was calculated by the computer");
-                        xcoor = coords[0].ToString();
-                        ycoor = coords[1].ToString();
-                        randomize = false;
-                        Logs.Add("O: " + xcoor + "," + ycoor);
-                        break;
-                    }
-                    randomize = true;
-                    attempts++;
-                }
 
+                string coords = AIprayingformydownfall();
+                if (Pool.Contains(coords))
+                {
+                    Console.WriteLine("The coordinates: " + coords[0] + "," + coords[1] + " was calculated by the computer");
+                    xcoor = coords[0].ToString();
+                    ycoor = coords[1].ToString();
+                    Logs.Add("O: " + xcoor + "," + ycoor);
+                }
                 // No smart play so just pick a random valid coordinate from the pool
-                if (randomize)
+                else
                 {
                     Console.WriteLine("AI function was not called");
                     int computerMove = rnd.Next(0, Pool.Count);
@@ -381,7 +423,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
 
         static void display(string[,] board)
         {
-            //Console.Clear();
+            Console.Clear();
             Console.WriteLine("Player Human:X \t Player Computer:O");
             Console.WriteLine("Human Wins:{0} \t Computer Wins:{1}", HumanWins, ComputerWins);
             for (int row = 0; row < board.GetLength(0); row++)
